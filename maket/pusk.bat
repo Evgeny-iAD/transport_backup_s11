@@ -1,0 +1,1 @@
+start H:\PYTHON\Project_Py\SSH_snapshot_DB\maket\pyuic5.exe -x Transpotr_maket.ui -o Transpotr_maket.py
