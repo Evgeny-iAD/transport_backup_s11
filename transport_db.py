@@ -8,6 +8,7 @@ from datetime import date, timedelta, datetime
 from PyQt5.QtCore import Qt
 from maket.Transpotr_maket import *
 from Date_dum import date_dump
+import logging.config
 
 warnings.filterwarnings('ignore', '.*Failed to load HostKeys.*')
 
@@ -36,7 +37,7 @@ def zapis_json(filename, host, remoteP, localP):
     with open(filename, 'w') as f:
         data_json = {'host': host, 'remoteP': remoteP, 'localP': localP}
         json.dump(data_json, f)
-
+        logging.info('Добавление записи в date_dump')
 
 class Path_file:
     def __init__(self, path, db, data):
@@ -46,6 +47,7 @@ class Path_file:
 
     def __str__(self):
         print(f'{self.path}{self.db}.{self.data}.sql.gz')
+        logging.info(f'{self.path}{self.db}.{self.data}.sql.gz')
         return f'{self.path}{self.db}.{self.data}.sql.gz'
         # if self.path == 'remote':
         #     return f'/home/backup/{self.db}.{self.data}.sql.gz'
@@ -75,6 +77,7 @@ class Export_DB:
                     date_dump = []
                     print(self.remotepath)
                     print(f'Соединение установлено в {datetime.now()} ')
+                    logging.info(f'Соединение установлено в {datetime.now()} ')
                     sftp.cwd(self.remotepath)
                     dir_struct = sftp.listdir_attr()
                     for attr in dir_struct:
@@ -105,10 +108,12 @@ class Export_DB:
             with pysftp.Connection(host=self.host, port=22, username=self.user, password=self.secret,
                                    cnopts=self.cnopts, ) as sftp:
                 print('Подключение к серверу прошло успешно...')  # 25%
+                logging.info(f'Подключение к серверу прошло успешно... ')
                 ui.progressBar.setValue(25)
                 ui.progressBar.setFormat('Подключение к серверу прошло успешно...')
                 ui.progressBar.setAlignment(Qt.AlignCenter)
                 print('Начинаю процесс копирования s11...')  # 37,5%
+                logging.info('Начинаю процесс копирования s11...')
                 ui.progressBar.setValue(37)
                 ui.progressBar.setFormat('Начинаю процесс копирования s11...')
                 ui.progressBar.setAlignment(Qt.AlignCenter)
@@ -119,16 +124,19 @@ class Export_DB:
                               f'{ui.calendarWidget.selectedDate().toString("yyyy-MM-dd")}').__str__()
                 )
                 print('Процесс копирования дампа s11 завершен')  # 50%
+                logging.info('Процесс копирования дампа s11 завершен')
                 ui.progressBar.setValue(50)
                 ui.progressBar.setFormat('Процесс копирования дампа s11 завершен')
                 ui.progressBar.setAlignment(Qt.AlignCenter)
             with pysftp.Connection(host=self.host, port=22, username=self.user, password=self.secret,
                                    cnopts=self.cnopts, ) as sftp:
                 print('Подключение к серверу прошло успешно...')  # 62,5%
+                logging.info('Процесс копирования дампа s11 завершен')
                 ui.progressBar.setValue(62)
                 ui.progressBar.setFormat('Подключение к серверу прошло успешно...')
                 ui.progressBar.setAlignment(Qt.AlignCenter)
                 print('Начинаю процесс копирования mes...')  # 75%
+                logging.info('Начинаю процесс копирования mes...')
                 ui.progressBar.setValue(75)
                 ui.progressBar.setFormat('Начинаю процесс копирования mes...')
                 ui.progressBar.setAlignment(Qt.AlignCenter)
@@ -139,12 +147,14 @@ class Export_DB:
                               f'{ui.calendarWidget.selectedDate().toString("yyyy-MM-dd")}').__str__()
                 )
                 print('Процесс копирования дампа mes завершен')  # 87,5%
+                logging.info('Процесс копирования дампа mes завершен')
                 ui.progressBar.setValue(87)
                 ui.progressBar.setFormat('Процесс копирования дампа mes завершен')
                 ui.progressBar.setAlignment(Qt.AlignCenter)
         except:
             print('Дамп БД не найден!')
         print('процедура загрузки дампов завершена')  # 100%
+        logging.info('процедура загрузки дампов завершена')
         ui.progressBar.setValue(100)
         ui.progressBar.setFormat('Процедура загрузки дампов завершена')
         ui.progressBar.setAlignment(Qt.AlignCenter)
@@ -204,7 +214,6 @@ if __name__ == "__main__":
     def on_click_transport():
         expo = Export_DB(ui.lineEdit.text(), user_db, secret_db, cnopts, ui.lineEdit_2.text(), ui.lineEdit_3.text())
         expo.transport()
-
 
     ui.pushButton.clicked.connect(on_click_scan)
     ui.pushButton_2.clicked.connect(on_click_transport)
